@@ -1,6 +1,7 @@
 package edu.grinnell.csc207.soundsofsorting.sorts;
 
 import edu.grinnell.csc207.soundsofsorting.sortevents.CompareEvent;
+import edu.grinnell.csc207.soundsofsorting.sortevents.CopyEvent;
 import edu.grinnell.csc207.soundsofsorting.sortevents.SwapEvent;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public class Sorts {
 
                 if (arr[j].compareTo(arr[j + 1]) > 0) {
                     //log swap
-                    events.add(new SwapEvent<>(j, j + 1));
+                    events.add(new SwapEvent<T>(j, j + 1).apply(arr));
                 }
             }
         }
@@ -73,10 +74,9 @@ public class Sorts {
             //Do not waste resources if there is nothing to be done
             if (smallestIndex != i) {
                 //log swap
-                events.add(new SwapEvent<>(i, smallestIndex));
+                events.add(new SwapEvent<T>(i, smallestIndex).apply(arr));
             }
         }
-
         return events;
     }
 
@@ -98,16 +98,16 @@ public class Sorts {
         for (int i = 1; i < arr.length; i++) {
             for (int j = i; j > 0; j--) {
                 //log compare event
-                events.add(new CompareEvent<>(j, j - 1));
+                events.add(new CompareEvent<T>(j, j - 1).apply(arr));
 
                 if (arr[j].compareTo(arr[j - 1]) < 0) {
                     //log swap
-                    events.add(new SwapEvent<>(j, j - 1));
+                    events.add(new SwapEvent<T>(j, j - 1).apply(arr));
 
                 }
             }
         }
-        return events;
+       return events;
     }
 
     /**
@@ -120,56 +120,108 @@ public class Sorts {
     public static <T extends Comparable<? super T>> List<SortEvent<T>> mergeSort(
             T[] arr) {
 
+        List<SortEvent<T>> events = new ArrayList<>();
+
         int low = 0;
         int high = arr.length - 1;
 
-        T[] newArr = mergeSortRecursive(arr, low, high);
+        mergeSortRecursive(arr, low, high, events);
 
-        System.arraycopy(newArr, 0, arr, 0, newArr.length);
-
-        return null;
+        return events;
     }
 
     /**
-     * Peforms recursive merge on an array With left and right halves sorted in
-     * order
+     * Implementation of the merge function for the tim sort algorithm
      *
-     * @param <T> the carrier type of the array
-     * @param arr1 the first array to merge
-     * @param arr2 the second array to merge
-     * @return a sorted array
+     * @param <T>
+     * @param arr
+     * @param low
+     * @param middle
+     * @param high
+     * @param events
      */
-    public static <T extends Comparable<? super T>> T[] merge(T[] arr1, T[] arr2) {
-        int leftCount = 0;
-        int rightCount = 0;
-        int newArraySize = 0;
+    //Credit: https://www.youtube.com/watch?v=U4g1dMry4W4
+    public static <T extends Comparable<? super T>> void merge(T[] arr, int low, int middle, int high, List<SortEvent<T>> events) {
+        T[] leftArray = (T[]) new Comparable[middle - low + 1];
+        T[] rightArray = (T[]) new Comparable[high - middle];
 
-        T[] returnArray = Arrays.copyOf(arr1, arr1.length + arr2.length);
+        System.arraycopy(arr, low, leftArray, 0, leftArray.length);
+        System.arraycopy(arr, middle + 1, rightArray, 0, rightArray.length);
 
-        while (newArraySize < arr1.length + arr2.length) {
-            if (leftCount < arr1.length && rightCount < arr2.length) {
-                if (arr1[leftCount].compareTo(arr2[rightCount]) < 0) {
-                    returnArray[newArraySize] = arr1[leftCount];
-                    leftCount++;
-                } else {
-                    returnArray[newArraySize] = arr2[rightCount];
-                    rightCount++;
-                }
-            } else if (leftCount < arr1.length) {
-                returnArray[newArraySize] = arr1[leftCount];
-                leftCount++;
+        int leftSubArrCounter = 0;
+        int rightSubArrCounter = 0;
+        int arrCounter = low;
+
+        while (leftSubArrCounter < leftArray.length
+                && rightSubArrCounter < rightArray.length) {
+
+            //log compare event
+            events.add(new CompareEvent<T>(low + leftSubArrCounter, middle + 1 + rightSubArrCounter).apply(arr));
+            if (leftArray[leftSubArrCounter].compareTo(rightArray[rightSubArrCounter]) <= 0) {
+
+                //log copy event
+                events.add(new CopyEvent<T>(arrCounter++, low + leftSubArrCounter++).apply(arr));
+                //arr[arrCounter++] = leftArray[leftSubArrCounter++];
             } else {
-                returnArray[newArraySize] = arr2[rightCount];
-                rightCount++;
+                //log copy event
+                events.add(new CopyEvent<T>(arrCounter++, middle + 1 + rightSubArrCounter++).apply(arr));
+                //arr[arrCounter++] = rightArray[rightSubArrCounter++];
             }
-            newArraySize++;
-
         }
-        System.out.println(Arrays.toString(returnArray));
 
-        return returnArray;
+        while (leftSubArrCounter < leftArray.length) {
+            //log copy event
+            events.add(new CopyEvent<T>(arrCounter++, low + leftSubArrCounter++).apply(arr));
+            //arr[arrCounter++] = leftArray[leftSubArrCounter++];
+        }
+
+        while (rightSubArrCounter < rightArray.length) {
+            //log copy event
+            events.add(new CopyEvent<T>(arrCounter++, middle + 1 + rightSubArrCounter++).apply(arr));
+            //arr[arrCounter++] = rightArray[rightSubArrCounter++];
+        }
+
     }
 
+//    /**
+//     * Peforms recursive merge on an array With left and right halves sorted in
+//     * order
+//     *
+//     * @param <T> the carrier type of the array
+//     * @param arr1 the first array to merge
+//     * @param arr2 the second array to merge
+//     * @return a sorted array
+//     */
+//    public static <T extends Comparable<? super T>> T[] merge(T[] arr,int low,int  middle,int  high) {
+//        int leftCount = 0;
+//        int rightCount = 0;
+//        int newArraySize = low;
+//
+//        T[] returnArray = Arrays.copyOf(arr1, arr1.length + arr2.length);
+//
+//        while (newArraySize < arr1.length + arr2.length) {
+//            if (leftCount < arr1.length && rightCount < arr2.length) {
+//                if (arr1[leftCount].compareTo(arr2[rightCount]) < 0) {
+//                    returnArray[newArraySize] = arr1[leftCount];
+//                    leftCount++;
+//                } else {
+//                    returnArray[newArraySize] = arr2[rightCount];
+//                    rightCount++;
+//                }
+//            } else if (leftCount < arr1.length) {
+//                returnArray[newArraySize] = arr1[leftCount];
+//                leftCount++;
+//            } else {
+//                returnArray[newArraySize] = arr2[rightCount];
+//                rightCount++;
+//            }
+//            newArraySize++;
+//
+//        }
+//        System.out.println(Arrays.toString(returnArray));
+//
+//        return returnArray;
+//    }
     /**
      * *
      * Recursive function that calls itself and repeatedly divides and conquers
@@ -180,21 +232,22 @@ public class Sorts {
      * @param right right index of original arr
      * @return a sorted array
      */
-    public static <T extends Comparable<? super T>> T[] mergeSortRecursive(T[] arr, int left, int right) {
+    public static <T extends Comparable<? super T>> void mergeSortRecursive(T[] arr, int left, int right, List<SortEvent<T>> events) {
         //base case 
         int mid = left + (right - left) / 2;
 
         if (left == right) {
-            return Arrays.copyOfRange(arr, left, right + 1);
+            return;
         }
+
         //sortleft
-        T[] leftArray = mergeSortRecursive(arr, left, mid);
+        mergeSortRecursive(arr, left, mid, events);
 
         //sortright
-        T[] rightArray = mergeSortRecursive(arr, mid + 1, right);
+        mergeSortRecursive(arr, mid + 1, right, events);
 
         //sortMerge
-        return merge(leftArray, rightArray);
+        merge(arr, left, mid, right, events);
     }
 
     /**
@@ -236,13 +289,13 @@ public class Sorts {
 
         while (j < right) {
             //log compare event
-            events.add(new CompareEvent<>(j, pivot));
+            events.add(new CompareEvent<T>(j, pivot).apply(arr));
 
             if (arr[j].compareTo(arr[pivot]) < 0) {
                 i++;
 
                 //log swap
-                events.add(new SwapEvent<>(i, j));
+                events.add(new SwapEvent<T>(i, j).apply(arr));
 
             }
             j++;
@@ -251,7 +304,7 @@ public class Sorts {
         //put pivot in correct position
         i++;
         //log swap
-        events.add(new SwapEvent<>(i, j));
+        events.add(new SwapEvent<T>(i, j).apply(arr));
         pivot = i;
 
         //sort left of pivot
@@ -293,7 +346,7 @@ public class Sorts {
                 int right = Math.min(left + 2 * runSize - 1, arr.length - 1);
 
                 if (mid < right) {
-                    timSortMerge(arr, left, mid, right, events);
+                    merge(arr, left, mid, right, events);
 
                 }
             }
@@ -318,57 +371,79 @@ public class Sorts {
         for (int i = start; i <= end; i++) {
             for (int j = i; j > 0; j--) {
                 //log compare event
-                events.add(new CompareEvent<>(j, j - 1));
+                events.add(new CompareEvent<T>(j, j - 1).apply(arr));
 
                 if (arr[j].compareTo(arr[j - 1]) < 0) {
                     //log swap
-                    events.add(new SwapEvent<>(j, j - 1));
+                    events.add(new SwapEvent<T>(j, j - 1).apply(arr));
                 }
             }
         }
     }
 
+//    /**
+//     * Implementation of the merge function for the tim sort algorithm
+//     *
+//     * @param <T>
+//     * @param arr
+//     * @param low
+//     * @param middle
+//     * @param high
+//     * @param events
+//     */
+//    //Credit: https://www.youtube.com/watch?v=U4g1dMry4W4
+//    public static <T extends Comparable<? super T>> void timSortMerge(T[] arr, int low, int middle, int high, List<SortEvent<T>> events) {
+//        T[] leftArray = (T[]) new Comparable[middle - low + 1];
+//        T[] rightArray = (T[]) new Comparable[high - middle];
+//
+//        System.arraycopy(arr, low, leftArray, 0, leftArray.length);
+//        System.arraycopy(arr, middle + 1, rightArray, 0, rightArray.length);
+//
+//        int leftSubArrCounter = 0;
+//        int rightSubArrCounter = 0;
+//        int arrCounter = low;
+//
+//        while (leftSubArrCounter < leftArray.length
+//                && rightSubArrCounter < rightArray.length) {
+//
+//            //log compare event
+//            events.add(new CompareEvent<>(low + leftSubArrCounter, middle + 1 + rightSubArrCounter));
+//            if (leftArray[leftSubArrCounter].compareTo(rightArray[rightSubArrCounter]) <= 0) {
+//
+//                //log copy event
+//                events.add(new CopyEvent<>(arrCounter++, low + leftSubArrCounter++));
+//                //arr[arrCounter++] = leftArray[leftSubArrCounter++];
+//            } else {
+//                //log copy event
+//                events.add(new CopyEvent<>(arrCounter++, middle + 1 + rightSubArrCounter++));
+//                //arr[arrCounter++] = rightArray[rightSubArrCounter++];
+//            }
+//        }
+//
+//        while (leftSubArrCounter < leftArray.length) {
+//            //log copy event
+//            events.add(new CopyEvent<>(arrCounter++, low + leftSubArrCounter++));
+//            //arr[arrCounter++] = leftArray[leftSubArrCounter++];
+//        }
+//
+//        while (rightSubArrCounter < rightArray.length) {
+//            //log copy event
+//            events.add(new CopyEvent<>(arrCounter++, middle + 1 + rightSubArrCounter++));
+//            // arr[arrCounter++] = rightArray[rightSubArrCounter++];
+//        }
+//
+//    }
     /**
-     * Implementation of the merge function for the tim sort algorithm
+     * Applies all events to array in order
      *
      * @param <T>
-     * @param arr
-     * @param low
-     * @param middle
-     * @param high
-     * @param events
+     * @param l array list of T[] type
+     * @param events list of events to be executed
      */
-    //Credit: https://www.youtube.com/watch?v=U4g1dMry4W4
-    public static <T extends Comparable<? super T>> void timSortMerge(T[] arr, int low, int middle, int high, List<SortEvent<T>> events) {
-        T[] leftArray = (T[]) new Comparable[middle - low + 1];
-        T[] rightArray = (T[]) new Comparable[high - middle];
+    public static <T> void eventSort(T[] l, List<SortEvent<T>> events) {
 
-        System.arraycopy(arr, low, leftArray, 0, leftArray.length);
-        System.arraycopy(arr, middle + 1, rightArray, 0, rightArray.length);
-
-        int leftSubArrCounter = 0;
-        int rightSubArrCounter = 0;
-        int arrCounter = low;
-
-        while (leftSubArrCounter < leftArray.length
-                && rightSubArrCounter < rightArray.length) {
-            
-          
-            if(leftArray[leftSubArrCounter].compareTo(rightArray[rightSubArrCounter]) <= 0){
-                 arr[arrCounter++] = leftArray[leftSubArrCounter++];
-            }
-            else{
-                 arr[arrCounter++] = rightArray[rightSubArrCounter++];
-            }
+        for (SortEvent event : events) {
+            event.apply(l);
         }
-
-        while (leftSubArrCounter < leftArray.length) {
-            arr[arrCounter++] = leftArray[leftSubArrCounter++];
-        }
-
-        while (rightSubArrCounter < rightArray.length) {
-            arr[arrCounter++] = rightArray[rightSubArrCounter++];
-        }
-
     }
 }

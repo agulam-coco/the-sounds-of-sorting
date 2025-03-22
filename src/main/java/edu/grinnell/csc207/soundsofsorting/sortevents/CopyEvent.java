@@ -21,10 +21,11 @@ public class CopyEvent<T> implements SortEvent<T>{
         indeces.add(secondIndex);
     }
     
-    //Does nothing to the array
     @Override
-    public void apply(T[] arr) {
+    public SortEvent<T> apply(T[] arr) {
         arr[getAffectedIndices().get(0)] = arr[getAffectedIndices().get(1)];
+       
+        return this;
     }
     
     @Override

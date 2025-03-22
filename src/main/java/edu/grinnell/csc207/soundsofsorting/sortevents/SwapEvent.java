@@ -15,18 +15,23 @@ public class SwapEvent<T> implements SortEvent<T> {
      * @param firstIndex
      * @param secondIndex 
      */
-    public <T> SwapEvent(int firstIndex, int secondIndex){
+    public SwapEvent(int firstIndex, int secondIndex){
         indeces = new ArrayList<>();
         indeces.add(firstIndex);
         indeces.add(secondIndex);
     }
     
-    //Does nothing to the array
+    /**
+     *
+     * @param arr
+     * @return 
+     */
     @Override
-    public void apply(T[] arr) {
+    public SortEvent<T> apply(T[] arr) {
         
         swap(arr,getAffectedIndices().get(0),getAffectedIndices().get(1));
-        //DO NOTHING
+        
+        return this;
     }
     
     @Override

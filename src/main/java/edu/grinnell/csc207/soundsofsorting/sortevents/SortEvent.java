@@ -9,8 +9,9 @@ public interface SortEvent<T> {
     /**
      * Applies this event to the array.
      * @param arr the array to modify
+     * @return return sort event to method chain
      */
-    public void apply(T[] arr);
+    public SortEvent<T> apply(T[] arr);
 
     /**
      * @return a list of the indices affected by this event

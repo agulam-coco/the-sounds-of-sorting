@@ -6,11 +6,13 @@ package edu.grinnell.csc207.soundsofsorting;
  * in the program.
  */
 public class NoteIndices {
+    
+    private Integer[] notesArr;
     /**
      * @param n the size of the scale object that these indices map into
      */
     public NoteIndices(int n) {
-        // TODO: fill me in!
+        initializeAndShuffle(n);
     }
     
     /**
@@ -20,7 +22,8 @@ public class NoteIndices {
      * @param n the size of the scale object that these indices map into
      */
     public void initializeAndShuffle(int n) {
-        // TODO: fill me in!
+                notesArr = new Integer[n];
+
     }
     
     /** @return the indices of this NoteIndices object */

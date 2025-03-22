@@ -24,8 +24,9 @@ public class CompareEvent<T> implements SortEvent<T> {
     
     //Does nothing to the array
     @Override
-    public void apply(T[] arr) {
+    public SortEvent<T> apply(T[] arr) {
         //DO NOTHING
+        return this;
     }
     
     @Override
