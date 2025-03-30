@@ -160,11 +160,16 @@ public class Sorts {
             if (leftArray[leftSubArrCounter].compareTo(rightArray[rightSubArrCounter]) <= 0) {
 
                 //log copy event
-                events.add(new CopyEvent<T>(arrCounter, low + leftSubArrCounter).apply(arr));
+                arr[arrCounter] = leftArray[leftSubArrCounter];
+                events.add(new CopyEvent<>(arrCounter, low + leftSubArrCounter));
+                //events.add(new CopyEvent<T>(arrCounter, low + leftSubArrCounter).apply(arr));
                 leftSubArrCounter++;
             } else {
                 //log copy event
-                events.add(new CopyEvent<T>(arrCounter, middle + 1 + rightSubArrCounter).apply(arr));
+                 //log copy event
+                arr[arrCounter] = rightArray[rightSubArrCounter];
+                events.add(new CopyEvent<>(arrCounter, middle + 1 + rightSubArrCounter));
+               // events.add(new CopyEvent<T>(arrCounter, middle + 1 + rightSubArrCounter).apply(arr));
                 rightSubArrCounter++;
             }
             arrCounter++;
@@ -172,7 +177,9 @@ public class Sorts {
 
         while (leftSubArrCounter < leftArray.length) {
             //log copy event
-            events.add(new CopyEvent<T>(arrCounter, low + leftSubArrCounter).apply(arr));
+             arr[arrCounter] = leftArray[leftSubArrCounter];
+                events.add(new CopyEvent<>(arrCounter, low + leftSubArrCounter));
+           // events.add(new CopyEvent<T>(arrCounter, low + leftSubArrCounter).apply(arr));
             arrCounter++;
             leftSubArrCounter++;
 
@@ -180,7 +187,9 @@ public class Sorts {
 
         while (rightSubArrCounter < rightArray.length) {
             //log copy event
-            events.add(new CopyEvent<T>(arrCounter, middle + 1 + rightSubArrCounter).apply(arr));
+              arr[arrCounter] = rightArray[rightSubArrCounter];
+                events.add(new CopyEvent<>(arrCounter, middle + 1 + rightSubArrCounter));
+           // events.add(new CopyEvent<T>(arrCounter, middle + 1 + rightSubArrCounter).apply(arr));
             arrCounter++;
             rightSubArrCounter++;
 
@@ -199,10 +208,13 @@ public class Sorts {
      * @return a sorted array
      */
     public static <T extends Comparable<? super T>> void mergeSortRecursive(T[] arr, int left, int right, List<SortEvent<T>> events) {
-        //base case 
+        //base case    
         int mid = left + (right - left) / 2;
 
-        if (left == right) {
+        System.out.println(left >= right);
+        System.out.println();
+
+        if (left >= right) {
             return;
         }
 
@@ -313,7 +325,6 @@ public class Sorts {
 
                 if (mid < right) {
                     merge(arr, left, mid, right, events);
-
                 }
             }
         }

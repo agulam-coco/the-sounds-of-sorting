@@ -181,6 +181,7 @@ public class ControlPanel extends JPanel {
                 Timer timer = new Timer();
                 timer.schedule(new TimerTask() {
                     private int index = 0;
+                    private Integer[] disposableCopy = notes.getNotes().clone();
 
                     @Override
                     public void run() {
@@ -190,9 +191,19 @@ public class ControlPanel extends JPanel {
 
                             SortEvent<Integer> e = events.get(index++);
 
-                            e.apply(notes.getNotes());
-                            //play the note
+                            //special case for merge sort
+                            if (sorts.getSelectedItem().equals("Merge") && e.isEmphasized()) {
+                                //copy index from temp into notes array
+                                notes.getNotes()[e.getAffectedIndices().get(0)] = disposableCopy[e.getAffectedIndices().get(1)];
 
+                                System.out.println("WE HERE BOI DOING COPY");
+                            } else {
+                                System.out.println("NOT DOING IT YEAH");
+System.out.println(e.isEmphasized());
+                                e.apply(notes.getNotes());
+                            }
+
+                            //play the note
                             //highlight all indexes
                             for (int i : e.getAffectedIndices()) {
                                 notes.highlightNote(i);
