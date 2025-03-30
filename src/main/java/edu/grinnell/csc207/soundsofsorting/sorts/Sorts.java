@@ -125,7 +125,9 @@ public class Sorts {
         int low = 0;
         int high = arr.length - 1;
 
-        mergeSortRecursive(arr, low, high, events);
+        if (arr.length > 0) {
+            mergeSortRecursive(arr, low, high, events);
+        }
 
         return events;
     }
@@ -160,16 +162,11 @@ public class Sorts {
             if (leftArray[leftSubArrCounter].compareTo(rightArray[rightSubArrCounter]) <= 0) {
 
                 //log copy event
-                arr[arrCounter] = leftArray[leftSubArrCounter];
-                events.add(new CopyEvent<>(arrCounter, low + leftSubArrCounter));
-                //events.add(new CopyEvent<T>(arrCounter, low + leftSubArrCounter).apply(arr));
+                events.add(new CopyEvent<>(arrCounter, leftArray[leftSubArrCounter]).apply(arr));
                 leftSubArrCounter++;
             } else {
                 //log copy event
-                 //log copy event
-                arr[arrCounter] = rightArray[rightSubArrCounter];
-                events.add(new CopyEvent<>(arrCounter, middle + 1 + rightSubArrCounter));
-               // events.add(new CopyEvent<T>(arrCounter, middle + 1 + rightSubArrCounter).apply(arr));
+                events.add(new CopyEvent<>(arrCounter, rightArray[rightSubArrCounter]).apply(arr));
                 rightSubArrCounter++;
             }
             arrCounter++;
@@ -177,9 +174,7 @@ public class Sorts {
 
         while (leftSubArrCounter < leftArray.length) {
             //log copy event
-             arr[arrCounter] = leftArray[leftSubArrCounter];
-                events.add(new CopyEvent<>(arrCounter, low + leftSubArrCounter));
-           // events.add(new CopyEvent<T>(arrCounter, low + leftSubArrCounter).apply(arr));
+            events.add(new CopyEvent<>(arrCounter, leftArray[leftSubArrCounter]).apply(arr));
             arrCounter++;
             leftSubArrCounter++;
 
@@ -187,9 +182,7 @@ public class Sorts {
 
         while (rightSubArrCounter < rightArray.length) {
             //log copy event
-              arr[arrCounter] = rightArray[rightSubArrCounter];
-                events.add(new CopyEvent<>(arrCounter, middle + 1 + rightSubArrCounter));
-           // events.add(new CopyEvent<T>(arrCounter, middle + 1 + rightSubArrCounter).apply(arr));
+            events.add(new CopyEvent<>(arrCounter, rightArray[rightSubArrCounter]).apply(arr));
             arrCounter++;
             rightSubArrCounter++;
 
@@ -241,7 +234,9 @@ public class Sorts {
         int low = 0;
         int high = arr.length - 1;
 
-        quickSortRecursive(arr, low, high, events);
+        if (arr.length > 0) {
+            quickSortRecursive(arr, low, high, events);
+        }
 
         return events;
     }

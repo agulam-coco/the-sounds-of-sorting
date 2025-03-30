@@ -1,6 +1,7 @@
 package edu.grinnell.csc207.soundsofsorting.sortevents;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -8,29 +9,30 @@ import java.util.List;
  */
 public class CopyEvent<T> implements SortEvent<T>{
    
-    private List<Integer> indeces;
+    private int index;
+    private T value;
     
     /**
      * Initialize Compare Event and add compared events to a list
-     * @param firstIndex
-     * @param secondIndex 
+     * @param value
+     * @param index
      */
-    public CopyEvent(int firstIndex, int secondIndex){
-        indeces = new ArrayList<>();
-        indeces.add(firstIndex);
-        indeces.add(secondIndex);
+    public CopyEvent(int index, T value){
+        this.value = value;
+        this.index = index;
+        
     }
     
     @Override
     public SortEvent<T> apply(T[] arr) {
-        arr[getAffectedIndices().get(0)] = arr[getAffectedIndices().get(1)];
+        arr[getAffectedIndices().get(0)] = this.value;
        
         return this;
     }
     
     @Override
      public List<Integer> getAffectedIndices(){
-         return indeces;
+         return Arrays.asList(index);
      }
     
     @Override

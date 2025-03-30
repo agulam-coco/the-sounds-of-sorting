@@ -187,32 +187,22 @@ public class ControlPanel extends JPanel {
                     public void run() {
                         if (index < events.size()) {
                             //clear previously highlighted indexes
-                            //notes.clearAllHighlighted();
+                            notes.clearAllHighlighted();
 
                             SortEvent<Integer> e = events.get(index++);
 
-                            //special case for merge sort
-                            if (sorts.getSelectedItem().equals("Merge") && e.isEmphasized()) {
-                                //copy index from temp into notes array
-                                notes.getNotes()[e.getAffectedIndices().get(0)] = disposableCopy[e.getAffectedIndices().get(1)];
-
-                                System.out.println("WE HERE BOI DOING COPY");
-                            } else {
-                                System.out.println("NOT DOING IT YEAH");
-System.out.println(e.isEmphasized());
-                                e.apply(notes.getNotes());
-                            }
+                            e.apply(notes.getNotes());
 
                             //play the note
-                            //highlight all indexes
-                            for (int i : e.getAffectedIndices()) {
-                                notes.highlightNote(i);
-                            }
-
                             // TODO: fill me in!
                             // 1. Apply the next sort event.
                             // 3. Play the corresponding notes denoted by the
                             //    affected indices logged in the event.
+                            for (int affectedIndex : e.getAffectedIndices()) {
+                                scale.playNote(affectedIndex, e.isEmphasized());
+                                notes.highlightNote(affectedIndex);
+                            }
+
                             // 4. Highlight those affected indices.
                             panel.repaint();
                         } else {

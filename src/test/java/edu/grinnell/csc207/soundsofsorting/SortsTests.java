@@ -2,15 +2,15 @@ package edu.grinnell.csc207.soundsofsorting;
 
 import edu.grinnell.csc207.soundsofsorting.sortevents.SortEvent;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
 
 import edu.grinnell.csc207.soundsofsorting.sorts.Sorts;
-import java.util.Arrays;
-import java.util.List;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SortsTests {
 
@@ -20,7 +20,6 @@ public class SortsTests {
      * @return true if <code>arr</code> is sorted.
      */
     public static <T extends Comparable<? super T>> boolean sorted(T[] arr) {
-
         for (int i = 0; i < arr.length - 1; i++) {
             if (arr[i].compareTo(arr[i + 1]) > 0) {
                 return false;
@@ -30,8 +29,6 @@ public class SortsTests {
     }
 
     public static Integer[] makeTestArray() {
-        
-        //Credit: Chat GPT
         return new Integer[]{
             312, 47, 129, 406, 75, 281, 168, 432, 90, 254,
             379, 136, 481, 219, 68, 323, 157, 493, 110, 302,
@@ -74,86 +71,124 @@ public class SortsTests {
             262, 129, 198, 385, 103, 28, 463, 313, 88, 226,
             0, 266, 243, 137, 398, 4, 166, 420, 473, 195
         };
-
     }
 
-    public void testSort(Consumer<Integer[]> func) {
+    public void testSort(Function<Integer[], List<SortEvent<Integer>>> func) {
         Integer[] arr = makeTestArray();
-        func.accept(arr);
-        System.out.println(Arrays.toString(arr));
+        Integer[] temp = arr.clone();
 
+        List<SortEvent<Integer>> events = func.apply(arr);
+        Sorts.eventSort(temp, events);
+
+        assertEquals(0, Arrays.compare(arr, temp), "Event sort failed with given events on arr");
     }
 
     @Test
     public void testBubbleSort() {
         testSort(Sorts::bubbleSort);
-        Integer[] original = makeTestArray();
-        Integer[] temp = original.clone();
-
-        List<SortEvent<Integer>> events = Sorts.bubbleSort(original);
-        Sorts.eventSort(temp, events);
-
-        assertEquals(0, Arrays.compare(original, temp), "Event sort failed with given events on arr");
     }
 
     @Test
     public void testInsertionSort() {
         testSort(Sorts::insertionSort);
-        Integer[] original = makeTestArray();
-        Integer[] temp = original.clone();
-
-        List<SortEvent<Integer>> events = Sorts.insertionSort(original);
-        Sorts.eventSort(temp, events);
-
-        assertEquals(0, Arrays.compare(original, temp), "Event sort failed with given events on arr");
     }
 
     @Test
     public void testSelectionSort() {
         testSort(Sorts::selectionSort);
-        Integer[] original = makeTestArray();
-        Integer[] temp = original.clone();
-
-        List<SortEvent<Integer>> events = Sorts.selectionSort(original);
-        Sorts.eventSort(temp, events);
-
-        assertEquals(0, Arrays.compare(original, temp), "Event sort failed with given events on arr");
     }
 
     @Test
     public void testMergeSort() {
         testSort(Sorts::mergeSort);
-        Integer[] original = makeTestArray();
-        Integer[] temp = original.clone();
-
-        List<SortEvent<Integer>> events = Sorts.mergeSort(original);
-        Sorts.eventSort(temp, events);
-
-        assertEquals(0, Arrays.compare(original, temp), "Event sort failed with given events on arr");
     }
 
     @Test
     public void testQuickSort() {
         testSort(Sorts::quickSort);
-        Integer[] original = makeTestArray();
-        Integer[] temp = original.clone();
-
-        List<SortEvent<Integer>> events = Sorts.quickSort(original);
-        Sorts.eventSort(temp, events);
-
-        assertEquals(0, Arrays.compare(original, temp), "Event sort failed with given events on arr");
     }
 
     @Test
     public void testTimSort() {
         testSort(Sorts::timSort);
-        Integer[] original = makeTestArray();
-        Integer[] temp = original.clone();
-
-        List<SortEvent<Integer>> events = Sorts.timSort(original);
-        Sorts.eventSort(temp, events);
-
-        assertEquals(0, Arrays.compare(original, temp), "Event sort failed with given events on arr");
     }
 
+    // Helper method to test all sort functions on a given array
+    private void testAllSorts(Integer[] original) {
+        List<Function<Integer[], List<SortEvent<Integer>>>> sortFunctions = List.of(
+                Sorts::bubbleSort,
+                Sorts::insertionSort,
+                Sorts::selectionSort,
+                Sorts::mergeSort,
+                Sorts::quickSort,
+                Sorts::timSort
+        );
+
+        for (Function<Integer[], List<SortEvent<Integer>>> func : sortFunctions) {
+            Integer[] arr = original.clone();
+            Integer[] temp = arr.clone();
+            List<SortEvent<Integer>> events = func.apply(arr);
+            Sorts.eventSort(temp, events);
+
+            Integer[] expected = original.clone();
+            Arrays.sort(expected);
+            assertTrue(sorted(arr), "Array is not sorted by sort function.");
+            assertEquals(Arrays.asList(expected), Arrays.asList(temp), "Event sort did not match expected.");
+        }
+    }
+
+    @Test
+    public void testEmptyArray() {
+        Integer[] arr = new Integer[0];
+        testAllSorts(arr);
+    }
+
+    @Test
+    public void testSingleElementArray() {
+        Integer[] arr = new Integer[]{42};
+        testAllSorts(arr);
+    }
+
+    @Test
+    public void testAlreadySortedArray() {
+        Integer[] arr = new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+        testAllSorts(arr);
+    }
+
+    @Test
+    public void testReverseSortedArray() {
+        Integer[] arr = new Integer[]{10, 9, 8, 7, 6, 5, 4, 3, 2, 1};
+        testAllSorts(arr);
+    }
+
+    @Test
+    public void testAllEqualElements() {
+        Integer[] arr = new Integer[50];
+        Arrays.fill(arr, 7);
+        testAllSorts(arr);
+    }
+
+    @Test
+    public void testWithDuplicates() {
+        Integer[] arr = new Integer[]{5, 1, 3, 1, 2, 5, 4, 3, 2, 1, 4, 5};
+        testAllSorts(arr);
+    }
+
+    @Test
+    public void testWithNegativeNumbers() {
+        Integer[] arr = new Integer[]{-5, -1, -10, -3, 0, 2, -7, 4, -2};
+        testAllSorts(arr);
+    }
+
+    @Test
+    public void testWithMinMaxValues() {
+        Integer[] arr = new Integer[]{Integer.MAX_VALUE, 0, Integer.MIN_VALUE, 100, -100, Integer.MAX_VALUE};
+        testAllSorts(arr);
+    }
+
+    @Test
+    public void testAlternatingHighLowValues() {
+        Integer[] arr = new Integer[]{10, 1, 9, 2, 8, 3, 7, 4, 6, 5};
+        testAllSorts(arr);
+    }
 }
