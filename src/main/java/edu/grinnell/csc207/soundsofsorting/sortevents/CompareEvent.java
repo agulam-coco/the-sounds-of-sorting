@@ -4,39 +4,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A <code>CompareEvent</code> logs a comparison a sort makes between two
+ * A {@code CompareEvent} logs a comparison a sort makes between two
  * indices in the array.
+ *
+ * @param <T> the type of elements in the array
  */
 public class CompareEvent<T> implements SortEvent<T> {
-    
-    private List<Integer> indeces;
-    
+
+    private final List<Integer> indices;
+
     /**
-     * Initialize Compare Event and add compared events to a list
-     * @param firstIndex
-     * @param secondIndex 
+     * Constructs a CompareEvent for the given indices.
+     *
+     * @param firstIndex  the first index to compare
+     * @param secondIndex the second index to compare
      */
-    public CompareEvent(int firstIndex, int secondIndex){
-        indeces = new ArrayList<>();
-        indeces.add(firstIndex);
-        indeces.add(secondIndex);
+    public CompareEvent(int firstIndex, int secondIndex) {
+        indices = new ArrayList<>();
+        indices.add(firstIndex);
+        indices.add(secondIndex);
     }
-    
-    //Does nothing to the array
+
     @Override
     public SortEvent<T> apply(T[] arr) {
-        //DO NOTHING
         return this;
     }
-    
+
     @Override
-     public List<Integer> getAffectedIndices(){
-         return indeces;
-     }
-    
+    public List<Integer> getAffectedIndices() {
+        return indices;
+    }
+
     @Override
-    public boolean isEmphasized(){
-        //not emphasized
+    public boolean isEmphasized() {
         return false;
     }
 }

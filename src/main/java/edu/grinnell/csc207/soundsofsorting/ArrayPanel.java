@@ -3,27 +3,21 @@ package edu.grinnell.csc207.soundsofsorting;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.geom.Rectangle2D;
-import java.util.Arrays;
-
 import javax.swing.JPanel;
 
 /**
- * A drawing panel for visualizing the contents of a @NoteIndices object.
+ * A drawing panel for visualizing the contents of a {@code NoteIndices} object.
  */
 public class ArrayPanel extends JPanel {
 
     @SuppressWarnings("unused")
-    private NoteIndices notes;
+    private final NoteIndices notes;
 
     /**
-     * Create a new <code>ArrayPanel</code> with the given notes and dimensions.
+     * Creates a new {@code ArrayPanel} with the given notes and dimensions.
      *
-     * @param notes the note indices
-     * @param width the width of the panel
+     * @param notes  the note indices
+     * @param width  the width of the panel
      * @param height the height of the panel
      */
     public ArrayPanel(NoteIndices notes, int width, int height) {
@@ -32,33 +26,33 @@ public class ArrayPanel extends JPanel {
     }
 
     @Override
-    public void paintComponent(Graphics g) {
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-        //get panel height and width
-        //credit: https://stackoverflow.com/a/47796959
+        // Get panel dimensions
         double screenWidth = getWidth();
         double screenHeight = getHeight();
 
-        //rectangle width and block heights
+        // Calculate rectangle width and block height
         double rectWidth = screenWidth / notes.getNotes().length;
-        double blockHeight = ((1.0 / notes.getNotes().length) * screenHeight);
+        double blockHeight = (1.0 / notes.getNotes().length) * screenHeight;
 
-        //starting x index in canvas
+        // Starting x index on canvas
         int currentX = 0;
 
         for (int index : notes.getNotes()) {
-            //calculate height of rectangle rectangle
-            double rectHeight = ((int) index + 1.0) * blockHeight;
+            // Calculate height of rectangle
+            double rectHeight = (index + 1.0) * blockHeight;
 
-            //taller rectangles become more blue
-            //credit:https://stackoverflow.com/a/42855445
-            g.setColor(new Color(0, (int) 255 - (int) ((rectHeight / screenHeight) * 255), (int) ((rectHeight / screenHeight) * 255)));
+            // Taller rectangles become more blue
+            int blue = (int) ((rectHeight / screenHeight) * 255);
+            int green = 255 - blue;
 
-            g.fillRect(currentX, (int) (screenHeight - rectHeight),(int) rectWidth, (int) rectHeight);
+            g.setColor(new Color(0, green, blue));
+            g.fillRect(currentX, (int) (screenHeight - rectHeight), 
+                    (int) rectWidth, (int) rectHeight);
 
             currentX += rectWidth;
-
         }
-
     }
 }

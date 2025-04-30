@@ -7,44 +7,48 @@ import java.util.List;
  * A <code>SwapEvent</code> logs a swap between two indices of the array.
  */
 public class SwapEvent<T> implements SortEvent<T> {
+
     // TODO: implement me
     private List<Integer> indeces;
-    
+
     /**
      * Initialize Compare Event and add compared events to a list
+     *
      * @param firstIndex
-     * @param secondIndex 
+     * @param secondIndex
      */
-    public SwapEvent(int firstIndex, int secondIndex){
+    public SwapEvent(int firstIndex, int secondIndex) {
         indeces = new ArrayList<>();
         indeces.add(firstIndex);
         indeces.add(secondIndex);
     }
-    
+
     /**
+     * The application method of the event
      *
-     * @param arr
-     * @return 
+     * @param arr the array to apply it to
+     * @return self to allow chaining
      */
     @Override
     public SortEvent<T> apply(T[] arr) {
-        
-        swap(arr,getAffectedIndices().get(0),getAffectedIndices().get(1));
-        
+
+        swap(arr, getAffectedIndices().get(0), getAffectedIndices().get(1));
+
         return this;
     }
-    
+
     @Override
-     public List<Integer> getAffectedIndices(){
-         return indeces;
-     }
-    
+    public List<Integer> getAffectedIndices() {
+        return indeces;
+    }
+
     @Override
-    public boolean isEmphasized(){
+    public boolean isEmphasized() {
         //is emphasized
         return true;
     }
-        /**
+
+    /**
      * Swaps indices <code>i</code> and <code>j</code> of array
      * <code>arr</code>.
      *
