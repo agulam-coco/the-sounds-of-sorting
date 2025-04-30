@@ -1,3 +1,8 @@
+//REDO CHANGES
+
+Fixed the sound issue so that the sounds stop when the program completes. 
+Edited all style errors so that mvn checkstyle:check gives no warnings. 
+
 # CSC 207: The Sounds of Sorting
 
 **Author:** Jason Chigabatia  
