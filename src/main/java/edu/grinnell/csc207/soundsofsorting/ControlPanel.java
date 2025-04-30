@@ -199,8 +199,11 @@ public class ControlPanel extends JPanel {
                             // 3. Play the corresponding notes denoted by the
                             //    affected indices logged in the event.
                             for (int affectedIndex : e.getAffectedIndices()) {
-                                scale.playNote(affectedIndex, e.isEmphasized());
+                                if(e.isEmphasized()){
+                                            scale.playNote(affectedIndex, e.isEmphasized());
                                 notes.highlightNote(affectedIndex);
+                                }
+                        
                             }
 
                             // 4. Highlight those affected indices.
